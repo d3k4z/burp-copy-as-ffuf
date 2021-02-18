@@ -14,7 +14,7 @@
     - [ ] Create a `Copy as FFUF` submenu
     - [ ] Copy request and use Burp proxy for verification `Copy as FFUF skeleton, verify via Burp"`
     - [ ] Copy request and use Burp proxy for the attack `Copy as FFUF skeleton, proxy via Burp"`
-    
+
 - [ ] Maybe add a simple UI allowing to configure a path to wordlists
 
 ## Requirements
@@ -24,7 +24,7 @@
 ## Installation
 
 - Check if jython standalone is present in `Extender -> Options -> Python Environment`
-- Load the extention `Extender -> Extentions -> Add -> select path to CopyAsFFUF.py`
+- Load the extention `Extender -> Extensions -> Add -> select path to CopyAsFFUF.py`
 
 > Hopefully at some point PortSwigger with make it available in the bApp store
 
