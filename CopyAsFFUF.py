@@ -39,17 +39,14 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, IHttpRequestResponse):
         httpTraffic = self.context.getSelectedMessages()[0]
         httpRequest = httpTraffic.getRequest()
 
-        ffuf_cmd = "cat > request.http << EOF\r\n{httpRequest}\r\nEOF\r\n # add FUZZ string and use this command: \\ # ffuf -w <path_to_wordlist> -request request.http"
+        ffuf_cmd = "cat > request.http << EOF\r\n{httpRequest}\r\nEOF\r\n # add FUZZ string and use this command: \\ # ffuf -w <path_to_wordlist> -request request.http -u {httpService}"
 
         httpRequest = self.helpers.bytesToString(httpRequest)
 
-        data = ffuf_cmd.format(httpRequest=httpRequest)
+        data = ffuf_cmd.format(httpRequest=httpRequest, httpService=httpTraffic.getHttpService())
 
         self.copyToClipboard(data)
 
-        # CompassSecurity Note: 
-        # Ugly hack because VMware is messing up the clipboard if a text is still selected, the function
-        # has to be run in a separate thread which sleeps for 2 seconds.
         t = threading.Thread(target=self.copyToClipboard, args=(data,True))
         t.start()
 
