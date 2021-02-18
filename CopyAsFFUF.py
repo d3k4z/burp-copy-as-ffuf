@@ -39,7 +39,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, IHttpRequestResponse):
         httpTraffic = self.context.getSelectedMessages()[0]
         httpRequest = httpTraffic.getRequest()
 
-        ffuf_cmd = "cat > request.http << EOF\r\n{httpRequest}\r\nEOF\r\n # add FUZZ string and use this command: \\ # ffuf -w <path_to_wordlist> -request request.http -u {httpService}"
+        ffuf_cmd = "cat > request.http << EOF\r\n{httpRequest}\r\nEOF\r\n# What next? \r\n#\t1) Add a FUZZ string somewhere\r\n#\t2) Use the below command to fuzz\r\n# ffuf -w <path_to_wordlist> -request request.http -u {httpService}"
 
         httpRequest = self.helpers.bytesToString(httpRequest)
 
