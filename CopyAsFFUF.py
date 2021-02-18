@@ -30,7 +30,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, IHttpRequestResponse):
         self.context = invocation
         menuList = ArrayList()
 
-        menuList.add(JMenuItem("Copy as FFUF command-line",
+        menuList.add(JMenuItem("Copy as FFUF skeleton",
                 actionPerformed=self.copyRequest))
 
         return menuList
