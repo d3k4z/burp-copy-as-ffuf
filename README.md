@@ -1,5 +1,7 @@
 # Burp Extension: Copy As FFUF
 
+![](images/2021-02-24-09-51-50.png)
+
 ## Description
 
 `ffuf` ([https://github.com/ffuf/ffuf](https://github.com/ffuf/ffuf)) is gaining a lot of traction within the infosec community as a fast portable web fuzzer. It has been compared and aligned (kinda) to Burp's Intruder functionality. Thus, `Copy As FFUF` is trying to build that interoperatability bridge between the two.
