@@ -1,6 +1,6 @@
 # Burp Extension: Copy As FFUF
 
-![](images/2021-02-24-09-51-50.png)
+![](images/demo.png)
 
 ## Description
 
