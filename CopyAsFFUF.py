@@ -54,7 +54,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, IHttpRequestResponse):
         if sleep is True:
             time.sleep(1.5)
 
-        data = self.helpers.bytesToString(data)
+        data = self.helpers.bytesToString(data).replace('\r\n', '\n')
         systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
         systemSelection = Toolkit.getDefaultToolkit().getSystemSelection()
         transferText = StringSelection(data)
