@@ -31,7 +31,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, IHttpRequestResponse):
         # construct the FFUF command
         url_prefix = "https" if port != "80" else "http"
         url = "{}://{}/{}".format(url_prefix, host, path.lstrip("/"))
-        ffuf_cmd = "ffuf -X {} -u '{}'".format(method, url)
+        ffuf_cmd = "ffuf -w your-wordlist -X {} -u '{}FUZZ'".format(method, url)
 
         # extract headers and add them to FFUF command
         headers = [header for header in request_lines[1:] if not header.startswith("Host:")]
