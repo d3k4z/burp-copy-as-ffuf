@@ -11,29 +11,37 @@ import threading
 import time
 
 class BurpExtender(IBurpExtender, IContextMenuFactory, IHttpRequestResponse):
-    
-    def create_ffuf(self, ffuf_not_created):
-        
-        ffuf_not_created = ffuf_not_created.replace("\r","")
-        
-        space = " "
-        newline = "\n"
-        headersFFUF = '" -H "'
-        
-        ffuf_not_created = ffuf_not_created.replace(space,"")
-        
-            
-        ffuf_not_created = ffuf_not_created.replace("GET",'-X "GET" -H "',1)
-        ffuf_not_created = ffuf_not_created.replace("POST",'-X "POST" -H "',1)
-            
-        ffuf_not_created = ffuf_not_created.replace(newline,headersFFUF)
-        
-        ffuf_not_created+='"'
-        
-        ffuf_not_created = ffuf_not_created.replace('-H ""','')
-        
-        return ffuf_not_created
 
+    def create_ffuf(self, request):
+        request_str = self.helpers.bytesToString(request)
+        request_lines = request_str.strip().split('\n')
+
+        # extract method, path, and protocol
+        method, path, protocol = request_lines[0].split()
+
+        # extract host header
+        host_header = next((header for header in request_lines if header.startswith("Host:")), None)
+        if not host_header:
+            raise ValueError("Request does not contain a Host header")
+
+        # extract host and port from host header
+        host = host_header[len("Host:"):].strip()
+        port = "80" if protocol == "HTTP/1.1" else "443"
+
+        # construct the FFUF command
+        url_prefix = "https" if port != "80" else "http"
+        url = "{}://{}/{}".format(url_prefix, host, path.lstrip("/"))
+        ffuf_cmd = "ffuf -w your-wordlist -X {} -u '{}FUZZ'".format(method, url)
+
+        # extract headers and add them to FFUF command
+        headers = [header for header in request_lines[1:] if not header.startswith("Host:")]
+        for header in headers:
+            header_parts = header.split(':', 1)
+            if len(header_parts) == 2:
+                header_name, header_value = header_parts
+                ffuf_cmd += " -H '{}:{}'".format(header_name.strip(), header_value.strip())
+
+        return ffuf_cmd
 
     def str_to_array(self, string):
         return [ord(c) for c in string]
@@ -54,7 +62,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, IHttpRequestResponse):
 
         menuList.add(JMenuItem("Copy and transforms in ffuf command",
                 actionPerformed=self.copyRequest))
-        
+
         menuList.add(JMenuItem("Copy Request, ffuf command and tips",
                 actionPerformed=self.copyAllRequest))
 
@@ -66,36 +74,31 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, IHttpRequestResponse):
         httpRequest = self.helpers.bytesToString(httpRequest)
 
         RequestToFfuf = httpRequest
-        
+
         ffuf_cmd = self.create_ffuf(RequestToFfuf)
 
         self.copyToClipboard(ffuf_cmd)
 
         t = threading.Thread(target=self.copyToClipboard, args=(data,True))
         t.start()
-        
-        
+
     def copyAllRequest(self, event):
         httpTraffic = self.context.getSelectedMessages()[0]
         httpRequest = httpTraffic.getRequest()
         httpRequest = self.helpers.bytesToString(httpRequest)
 
         RequestToFfuf = httpRequest
-        
+
         ffuf_cmd = self.create_ffuf(RequestToFfuf)
-                
+
         copy = "---------------------------------\nFrom {httpService}\n---------------------------------\nHEADERS:\n\nEOF\n\n{httpRequest}\nEOF\n---------------------------------\nFFUF COMMAND:\n\n{ffuf_cmd}\n_____________________________________________________________\nThese are the headers and the ffuf command of your request.\nHappy FUZZING and good luck! :)\n_____________________________________________________________"
-        
+
         data = copy.format(httpService=httpTraffic.getHttpService(),httpRequest=httpRequest, ffuf_cmd=ffuf_cmd )
 
         self.copyToClipboard(data)
 
         t = threading.Thread(target=self.copyToClipboard, args=(data,True))
         t.start()
-        
-        
-        
-        
 
     def copyToClipboard(self, data, sleep=False):
         if sleep is True:
@@ -107,4 +110,3 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, IHttpRequestResponse):
         transferText = StringSelection(data)
         systemClipboard.setContents(transferText, None)
         systemSelection.setContents(transferText, None)
-        
